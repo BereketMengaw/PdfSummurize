@@ -1,6 +1,9 @@
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center px-6 lg:px-20">
+    <div
+      className="min-h-screen bg-gray-50 flex flex-col items-center px-6 lg:px-20"
+      id="/"
+    >
       {/* AI Badge */}
       <div className="bg-emerald-100 text-emerald-700 px-4 py-1 m-3 rounded-full text-sm font-medium flex items-center gap-2">
         <span>🚀 Powered by AI</span>
