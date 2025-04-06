@@ -1,6 +1,7 @@
 "use server";
 
 import { fetchAndExtractPdfText } from "@/lib/langchain";
+import { generateResult } from "@/lib/openai";
 
 export async function generatePdfSummary(
   uploadResponse: {
@@ -43,8 +44,38 @@ export async function generatePdfSummary(
   }
 
   try {
-    const response = await fetchAndExtractPdfText(pdfUrl);
-    console.log("Extracted PDF text:", response);
+    const PdfText = await fetchAndExtractPdfText(pdfUrl);
+    console.log("Extracted PDF text:", PdfText);
+
+    let result;
+    try {
+      result = await generateResult(PdfText);
+      console.log("Generated result:", result);
+    } catch (error) {
+      console.error("Error generating result:", error);
+      return {
+        success: false,
+        message: "Error generating result",
+        data: null,
+      };
+    }
+    if (!result) {
+      return {
+        success: false,
+        message: "Failed to generate result",
+        data: null,
+      };
+    }
+    console.log("Generated result:", result);
+
+    if (!result) {
+      return {
+        success: false,
+        message: "Failed to generate result",
+        data: null,
+      };
+    }
+    return {};
   } catch (error) {
     console.error("Error fetching PDF:", error);
     return {

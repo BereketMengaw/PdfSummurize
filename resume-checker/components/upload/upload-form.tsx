@@ -5,7 +5,8 @@ import { fetchAndExtractPdfText } from "@/lib/langchain";
 import { z } from "zod";
 import { useUploadThing } from "@/utils/uploadthing";
 import { toast } from "sonner"; // ✅ FIXED
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { generateResult } from "@/lib/openai";
 
 const schema = z.object({
   file: z
@@ -43,23 +44,6 @@ export default function UploadForm() {
     },
   });
 
-  // UseEffect to trigger when `url` is set
-  useEffect(() => {
-    if (url) {
-      const getSummary = async () => {
-        const summary = await fetchAndExtractPdfText(url);
-        if (!summary) {
-          toast.error("Failed to extract text from PDF.");
-          return;
-        }
-        // Here you can handle the summary, e.g., send it to your server or display it
-        console.log("Extracted PDF text:", summary);
-      };
-
-      getSummary();
-    }
-  }, [url]); // Trigger when `url` changes
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -77,6 +61,28 @@ export default function UploadForm() {
 
     // Start the upload process after file validation
     await startUpload([file]);
+
+    // Extracting text from the PDF
+    let summary = "";
+    if (url) {
+      try {
+        // Await the extraction of the PDF text
+        summary = await fetchAndExtractPdfText(url);
+        if (!summary) {
+          toast.error("Failed to extract text from PDF.");
+          return;
+        }
+
+        console.log("Extracted PDF text:", summary);
+
+        // Now call the generateResult with the extracted summary
+        const result = await generateResult(summary);
+        console.log("Generated result:", result);
+      } catch (error) {
+        console.error("Error processing the file:", error);
+        toast.error("An error occurred while processing the file.");
+      }
+    }
   };
 
   return (
