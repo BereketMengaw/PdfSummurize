@@ -4,8 +4,8 @@ import UploadFormInput from "@/components/upload/upload-form-input";
 import { fetchAndExtractPdfText } from "@/lib/langchain";
 import { z } from "zod";
 import { useUploadThing } from "@/utils/uploadthing";
-import { toast } from "sonner"; // ✅ FIXED
-import { useState } from "react";
+import { toast } from "sonner";
+import { useState, useRef } from "react";
 import { generateResult } from "@/lib/openai";
 
 const schema = z.object({
@@ -22,67 +22,75 @@ const schema = z.object({
 });
 
 export default function UploadForm() {
-  const [url, setUrl] = useState<string | null>(null); // Initialize URL state
+  const [url, setUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false); // ✅ Added loading state
+  const formRef = useRef<HTMLFormElement>(null);
 
-  // This stays outside the handleSubmit function
   const { startUpload } = useUploadThing("pdfUploader", {
     onClientUploadComplete: (res) => {
       if (res && res[0]?.url) {
-        setUrl(res[0].url); // Set the URL when upload is complete
-        const urlTwo = res[0].url;
-        console.log("Upload complete", urlTwo); // ✅ This will now work
+        setUrl(res[0].url);
+        console.log("Upload complete", res[0].url);
       } else {
         console.error("No URL found after upload.");
       }
     },
-
     onUploadError: () => {
       toast.error("There was an error uploading your file.");
     },
-    onUploadBegin: ({ file }) => {
+    onUploadBegin: () => {
       toast("Uploading your file...");
     },
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true); // ✅ Start loading
 
     const formData = new FormData(e.currentTarget);
     const file = formData.get("file") as File;
-
     const validated = schema.safeParse({ file });
 
     if (!validated.success) {
       toast.error(
         validated.error.flatten().fieldErrors.file?.[0] ?? "Invalid file"
       );
+      setLoading(false);
       return;
     }
 
-    // Start the upload process after file validation
-    await startUpload([file]);
+    try {
+      await startUpload([file]);
 
-    // Extracting text from the PDF
-    let summary = "";
-    if (url) {
-      try {
-        // Await the extraction of the PDF text
-        summary = await fetchAndExtractPdfText(url);
+      if (url) {
+        const summary = await fetchAndExtractPdfText(url);
+
         if (!summary) {
           toast.error("Failed to extract text from PDF.");
+          setLoading(false);
           return;
         }
 
-        console.log("Extracted PDF text:", summary);
-
-        // Now call the generateResult with the extracted summary
         const result = await generateResult(summary);
         console.log("Generated result:", result);
-      } catch (error) {
-        console.error("Error processing the file:", error);
-        toast.error("An error occurred while processing the file.");
+        const { data = null, message = null } = result || {};
+
+        if (data) {
+          toast.success("Resume processed successfully!");
+        }
+
+        if (message) {
+          toast.error(message);
+        }
+
+        formRef.current?.reset();
       }
+    } catch (error) {
+      console.error("Error processing the file:", error);
+      toast.error("An error occurred while processing the file.");
     }
+
+    setLoading(false); // ✅ End loading
   };
 
   return (
@@ -95,7 +103,11 @@ export default function UploadForm() {
         matches.
       </p>
       <div className="w-full bg-white p-2 rounded-lg shadow-lg border border-green-200">
-        <UploadFormInput onSubmit={handleSubmit} />
+        <UploadFormInput
+          ref={formRef}
+          onSubmit={handleSubmit}
+          loading={loading}
+        />
       </div>
     </div>
   );

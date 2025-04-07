@@ -1,5 +1,6 @@
 "use server";
 
+import { getDbConnection } from "@/lib/db";
 import { fetchAndExtractPdfText } from "@/lib/langchain";
 import { generateResult } from "@/lib/openai";
 
@@ -96,4 +97,41 @@ export async function generatePdfSummary(
       summary: "This is a placeholder summary.",
     },
   };
+}
+
+
+export saveResume(){
+  //all the logic for inserting the resume 
+
+  try{
+    const sql= await  getDbConnection();
+    await sql `INSERT INTO users (email, full_name, customer_id, price_id, status)
+VALUES ();
+`
+  }catch{
+      
+  }
+}
+
+export async function resumeSaver() {
+  //user loggedin and has a userId
+  //save pdfSummary
+  //savePdfSummary
+
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return {
+        success: false,
+        message: "user not found",
+      };
+    }
+    savepdf
+  } catch (error) {
+    return {
+      success: false,
+      Message:
+        error instanceof Error ? error.message : "Error saving pdf summary",
+    };
+  }
 }

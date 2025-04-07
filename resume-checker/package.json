@@ -11,6 +11,7 @@
   "dependencies": {
     "@clerk/nextjs": "^6.13.0",
     "@langchain/core": "^0.3.43",
+    "@neondatabase/serverless": "^1.0.0",
     "@radix-ui/react-slot": "^1.1.2",
     "@uploadthing/react": "^7.3.0",
     "class-variance-authority": "^0.7.1",
