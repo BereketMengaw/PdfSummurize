@@ -101,7 +101,7 @@ export async function generatePdfSummary(
 
 
 export saveResume(){
-  //all the logic for inserting the resume 
+  //all the logic for inserting the resumes and upadteing it 
 
   try{
     const sql= await  getDbConnection();
