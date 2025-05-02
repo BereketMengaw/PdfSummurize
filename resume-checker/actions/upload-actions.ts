@@ -3,6 +3,7 @@
 import { getDbConnection } from "@/lib/db";
 import { fetchAndExtractPdfText } from "@/lib/langchain";
 import { generateResult } from "@/lib/openai";
+import { auth } from "@clerk/nextjs/server";
 
 export async function generatePdfSummary(
   uploadResponse: {
@@ -100,23 +101,38 @@ export async function generatePdfSummary(
 }
 
 
-export saveResume(){
+async function saveResume({user_id, file_url, summary_text,file_name}:{
+  user_id: string;
+  file_url: string;
+  summary_text: string;
+  file_name: string;
+}) {
   //all the logic for inserting the resumes and upadteing it 
 
   try{
     const sql= await  getDbConnection();
-    await sql `INSERT INTO users (email, full_name, customer_id, price_id, status)
-VALUES ();
+    await sql `INSERT INTO Resume-checker (user_id, original_file_url, summary_text, status, title, file_name)
+VALUES (
+    '{user_id}', -- Example user ID
+    '{file_url}', -- Example file URL
+    '{summary_text}', -- Example summary text
+    'pending', -- Example status
+    'Resume Summary', -- Example title
+    '{file_name}' -- Example file name
+);
+
 `
   }catch{
       
   }
 }
 
-export async function resumeSaver() {
+export async function resumeSaverAction() {
   //user loggedin and has a userId
   //save pdfSummary
   //savePdfSummary
+
+  let saveResume;
 
   try {
     const { userId } = await auth();
@@ -126,7 +142,8 @@ export async function resumeSaver() {
         message: "user not found",
       };
     }
-    savepdf
+    saveResume = await saveResume({userId, file_url, summary_text, file_name}); 
+
   } catch (error) {
     return {
       success: false,
