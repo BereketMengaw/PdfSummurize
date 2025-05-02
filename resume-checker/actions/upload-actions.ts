@@ -5,6 +5,7 @@ import { fetchAndExtractPdfText } from "@/lib/langchain";
 import { generateResult } from "@/lib/openai";
 import { auth } from "@clerk/nextjs/server";
 
+
 export async function generatePdfSummary(
   uploadResponse: {
     serverData: {
@@ -101,8 +102,8 @@ export async function generatePdfSummary(
 }
 
 
-async function saveResume({user_id, file_url, summary_text,file_name}:{
-  user_id: string;
+async function saveResume({file_url, summary_text,file_name}:{
+
   file_url: string;
   summary_text: string;
   file_name: string;
@@ -113,13 +114,24 @@ async function saveResume({user_id, file_url, summary_text,file_name}:{
     const sql= await  getDbConnection();
     await sql `INSERT INTO Resume-checker (user_id, original_file_url, summary_text, status, title, file_name)
 VALUES (
-    '{user_id}', -- Example user ID
-    '{file_url}', -- Example file URL
-    '{summary_text}', -- Example summary text
-    'pending', -- Example status
-    'Resume Summary', -- Example title
-    '{file_name}' -- Example file name
+   
+    ${file_url},
+    ${summary_text},
+    ${file_name}
+  ) 
 );
+
+if (!saveResume) {
+  return {
+    success: false,
+    message: "Failed to save resume",
+  };
+} else {
+  return {
+    success: true,
+    message: "Resume saved successfully",
+  };
+}
 
 `
   }catch{
@@ -127,28 +139,49 @@ VALUES (
   }
 }
 
-export async function resumeSaverAction() {
-  //user loggedin and has a userId
-  //save pdfSummary
-  //savePdfSummary
-
-  let saveResume;
-
+export async function resumeSaverAction({
+  file_url,
+  summary_text,
+  file_name,
+}: {
+  file_url: string;
+  summary_text: string;
+  file_name: string;
+}) {
   try {
     const { userId } = await auth();
     if (!userId) {
       return {
         success: false,
-        message: "user not found",
+        message: "User not found",
       };
     }
-    saveResume = await saveResume({userId, file_url, summary_text, file_name}); 
+
+    const saveResumeInit = await saveResume({
+      user_id: userId,
+      file_url,
+      summary_text,
+      file_name,
+    });
+
+    if (!saveResumeInit) {
+      return {
+        success: false,
+        message: "Failed to save resume result, please try again...",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Resume result saved successfully",
+    };
 
   } catch (error) {
     return {
       success: false,
-      Message:
-        error instanceof Error ? error.message : "Error saving pdf summary",
+      message:
+        error instanceof Error ? error.message : "Error saving PDF summary",
     };
   }
 }
+

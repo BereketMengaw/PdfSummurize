@@ -8,23 +8,11 @@ import { toast } from "sonner";
 import { useState, useRef } from "react";
 import { generateResult } from "@/lib/openai";
 
-const schema = z.object({
-  file: z
-    .instanceof(File, { message: "Invalid file" })
-    .refine(
-      (file) => file.size <= 20 * 1024 * 1024,
-      "File must be less than 20MB"
-    )
-    .refine(
-      (file) => file.type === "application/pdf",
-      "Only PDF files allowed"
-    ),
-});
-
 export default function UploadForm() {
   const [url, setUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false); // ✅ Added loading state
   const formRef = useRef<HTMLFormElement>(null);
+  const [result, setResult] = useState<any | null>(null);
 
   const { startUpload } = useUploadThing("pdfUploader", {
     onClientUploadComplete: (res) => {
@@ -47,6 +35,19 @@ export default function UploadForm() {
     e.preventDefault();
     setLoading(true); // ✅ Start loading
 
+    const schema = z.object({
+      file: z
+        .instanceof(File, { message: "Invalid file" })
+        .refine(
+          (file) => file.size <= 20 * 1024 * 1024,
+          "File must be less than 20MB"
+        )
+        .refine(
+          (file) => file.type === "application/pdf",
+          "Only PDF files allowed"
+        ),
+    });
+
     const formData = new FormData(e.currentTarget);
     const file = formData.get("file") as File;
     const validated = schema.safeParse({ file });
@@ -64,6 +65,7 @@ export default function UploadForm() {
 
       if (url) {
         const summary = await fetchAndExtractPdfText(url);
+        console.log("Extracted PDF text:", summary);
 
         if (!summary) {
           toast.error("Failed to extract text from PDF.");
@@ -72,18 +74,10 @@ export default function UploadForm() {
         }
 
         const result = await generateResult(summary);
+        setResult(result); // Store the result in state
         console.log("Generated result:", result);
-        const { data = null, message = null } = result || {};
 
-        if (data) {
-          toast.success("Resume processed successfully!");
-        }
-
-        if (message) {
-          toast.error(message);
-        }
-
-        formRef.current?.reset();
+        formRef.current?.reset(); // Reset the form after successful upload
       }
     } catch (error) {
       console.error("Error processing the file:", error);
@@ -109,6 +103,15 @@ export default function UploadForm() {
           loading={loading}
         />
       </div>
+
+      {result && (
+        <div className="mt-10 p-6 bg-white border border-green-300 rounded-lg shadow-md">
+          <h3 className="text-xl font-bold text-green-800 mb-2">Resume Evaluation Summary</h3>
+          <p className="text-gray-700 mb-4">{result}</p>
+
+          
+        </div>
+      )}
     </div>
   );
 }
