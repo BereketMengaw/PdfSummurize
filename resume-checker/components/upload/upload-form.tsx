@@ -75,6 +75,8 @@ export default function UploadForm() {
 
         const result = await generateResult(summary);
         setResult(result); // Store the result in state
+        
+
         console.log("Generated result:", result);
 
         formRef.current?.reset(); // Reset the form after successful upload
@@ -86,6 +88,8 @@ export default function UploadForm() {
 
     setLoading(false); // ✅ End loading
   };
+
+  const parsedResult = typeof result === "string" ? JSON.parse(result) : result;
 
   return (
     <div className="flex flex-col items-center gap-2 w-full max-w-2xl mx-auto py-3">
@@ -103,15 +107,73 @@ export default function UploadForm() {
           loading={loading}
         />
       </div>
+      {parsedResult && (
+  <div className="mt-10 p-6 bg-white border border-green-300 rounded-2xl shadow-lg space-y-6">
+    <h3 className="text-2xl font-extrabold text-green-800">Resume Evaluation Summary</h3>
 
-      {result && (
-        <div className="mt-10 p-6 bg-white border border-green-300 rounded-lg shadow-md">
-          <h3 className="text-xl font-bold text-green-800 mb-2">Resume Evaluation Summary</h3>
-          <p className="text-gray-700 mb-4">{result}</p>
+    <div className="text-gray-700 space-y-4">
+      <div>
+        <span className="font-semibold text-green-600">📊 Score:</span>{" "}
+        {parsedResult.score}/100
+      </div>
 
-          
-        </div>
-      )}
+      <div>
+        <span className="font-semibold text-green-600">📝 Summary:</span>{" "}
+        {parsedResult.summary}
+      </div>
+
+      <div>
+        <span className="font-semibold text-green-600">✅ Positives:</span>
+        <ul className="list-disc list-inside mt-1">
+          {parsedResult.positives?.map((item, idx) => (
+            <li key={idx}>{item}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <span className="font-semibold text-red-600">❌ Negatives:</span>
+        <ul className="list-disc list-inside mt-1 text-red-800">
+          {parsedResult.negatives?.map((item, idx) => (
+            <li key={idx}>{item}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <span className="font-semibold text-yellow-600">🔍 Missing Items:</span>
+        <ul className="list-disc list-inside mt-1 text-yellow-800">
+          {parsedResult.missingItems?.map((item, idx) => (
+            <li key={idx}>{item}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <span className="font-semibold text-blue-600">💡 Recommendations:</span>
+        <ul className="list-disc list-inside mt-1 text-blue-800">
+          {parsedResult.recommendations?.map((item, idx) => (
+            <li key={idx}>{item}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <span className="font-semibold text-purple-600">📋 Section Feedback:</span>
+        <ul className="list-disc list-inside mt-1 text-purple-800">
+          {parsedResult.sectionFeedback &&
+            Object.entries(parsedResult.sectionFeedback).map(([key, value], idx) => (
+              <li key={idx}>
+                <strong className="capitalize">{key}:</strong> {value}
+              </li>
+            ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 }
