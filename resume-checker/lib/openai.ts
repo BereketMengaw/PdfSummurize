@@ -2,6 +2,15 @@
 import OpenAI from "openai";
 import { resumeGradingPrompt } from "@/utils/prompt";
 
+interface APIError {
+  status?: number;
+  message?: string;
+  response?: {
+    status?: number;
+    data?: unknown;
+  };
+}
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -11,8 +20,8 @@ console.log("OpenAI API Key:", process.env.OPENAI_API_KEY);
 export async function generateResult(pdfText: string) {
   let completion;
   try {
-    // Attempt to make the API call
-    console.log(pdfText, "this is what will be sent to the api");
+    console.log(pdfText, "this is what will be sent to the API");
+
     completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -22,47 +31,40 @@ export async function generateResult(pdfText: string) {
         },
         {
           role: "user",
-          content: `transform this document into ready easy-to-read and clear resume :/n/n${pdfText}`,
+          content: `Transform this document into a ready, easy-to-read, and clear resume:\n\n${pdfText}`,
         },
       ],
       temperature: 0.6,
       max_tokens: 1000,
     });
   } catch (error) {
-    // Generic error handler
-    console.error("Error generating result:", error);
+    const err = error as APIError;
+    const status = err?.status || err?.response?.status;
 
-    // Check for rate limit error (429)
-    if (error?.status === 429) {
-      console.error("Rate limit error:", error);
+    console.error("Error generating result:", err);
+
+    if (status === 429) {
+      console.error("Rate limit error:", err);
       throw new Error("Rate limit exceeded. Please try again later.");
-
-      // Check for server errors (500)
-    } else if (error?.status === 500) {
-      console.error("Server error:", error);
+    } else if (status === 500) {
+      console.error("Server error:", err);
       throw new Error("Server error. Please try again later.");
-
-      // Check for client-side errors (4xx)
-    } else if (error?.status >= 400 && error?.status < 500) {
-      console.error("Client error:", error);
+    } else if (status && status >= 400 && status < 500) {
+      console.error("Client error:", err);
       throw new Error(
-        `Client error: ${error.message}. Please check the request.`
+        `Client error: ${err.message || "Bad request"}. Please check the request.`
       );
-
-      // Other unexpected errors (network, timeout, etc.)
-    } else if (error?.message) {
-      console.error("Unexpected error:", error.message);
-      throw new Error(`Unexpected error: ${error.message}`);
-
-      // Catch any other type of error (e.g., a missing parameter or invalid API response)
+    } else if (err?.message) {
+      console.error("Unexpected error:", err.message);
+      throw new Error(`Unexpected error: ${err.message}`);
     } else {
-      console.error("Unknown error:", error);
+      console.error("Unknown error:", err);
       throw new Error("An unknown error occurred. Please try again.");
     }
   }
 
-  // If the API call was successful, return the result
-  console.log("Completion result:", completion.choices[0].message.content);
+  const result = completion.choices[0].message.content;
+  console.log("Completion result:", result);
 
-  return completion.choices[0].message.content;
+  return result;
 }

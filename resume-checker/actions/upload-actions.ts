@@ -139,6 +139,7 @@ if (!saveResume) {
   }
 }
 
+
 export async function resumeSaverAction({
   file_url,
   summary_text,
@@ -158,18 +159,13 @@ export async function resumeSaverAction({
     }
 
     const saveResumeInit = await saveResume({
-      user_id: userId,
+     
       file_url,
       summary_text,
       file_name,
     });
 
-    if (!saveResumeInit) {
-      return {
-        success: false,
-        message: "Failed to save resume result, please try again...",
-      };
-    }
+    
 
     return {
       success: true,

@@ -8,11 +8,22 @@ import { toast } from "sonner";
 import { useState, useRef } from "react";
 import { generateResult } from "@/lib/openai";
 
+type ParsedResult = {
+  score: number;
+  summary: string;
+  positives?: string[];
+  negatives?: string[];
+  missingItems?: string[];
+  recommendations?: string[];
+  sectionFeedback?: Record<string, string>;
+};
+
+
 export default function UploadForm() {
   const [url, setUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false); // ✅ Added loading state
   const formRef = useRef<HTMLFormElement>(null);
-  const [result, setResult] = useState<any | null>(null);
+  const [result, setResult] = useState<unknown | null>(null);
 
   const { startUpload } = useUploadThing("pdfUploader", {
     onClientUploadComplete: (res) => {
@@ -88,8 +99,13 @@ export default function UploadForm() {
 
     setLoading(false); // ✅ End loading
   };
+  
 
-  const parsedResult = typeof result === "string" ? JSON.parse(result) : result;
+  const parsedResult = (typeof result === "string"
+    ? JSON.parse(result)
+    : result) as ParsedResult;
+  
+  
 
   return (
     <div className="flex flex-col items-center gap-2 w-full max-w-2xl mx-auto py-3">

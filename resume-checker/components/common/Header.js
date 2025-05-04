@@ -46,13 +46,20 @@ export default function Header() {
       <div className="flex items-center">
         <div className="flex items-center space-x-2 group">
           <div className="p-1.5 bg-emerald-50 rounded-full group-hover:bg-emerald-100 transition-colors">
-          <NavLink
+            <SignedIn>
+              <div className="flex ">
+                <div className="flex align-bottom mr-1 ">
+                  <UserButton />
+                </div>
+                <NavLink
   href="/upload"
   className="px-4 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 font-medium transition-colors"
 >
   Upload a PDF
 </NavLink>
 
+              </div>
+            </SignedIn>
           </div>
           <SignedOut>
             <NavLink
