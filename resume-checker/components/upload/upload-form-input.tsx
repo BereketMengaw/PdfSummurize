@@ -17,8 +17,8 @@ const UploadFormInput = forwardRef<HTMLFormElement, UploadFormInputProps>(
         onSubmit={onSubmit}
       >
         <div className="flex flex-col gap-2 mt-6">
-          <label htmlFor="pdfUpload" className="text-white font-medium text-lg">
-            Choose a PDF file:
+          <label htmlFor="pdfUpload" className="text-white font-medium text-lg mx-auto">
+            Choose a Resume PDF file:
           </label>
           <input
             type="file"
@@ -35,7 +35,7 @@ const UploadFormInput = forwardRef<HTMLFormElement, UploadFormInputProps>(
           className="mt-4 py-2 bg-green-700 text-white hover:bg-green-800 focus:ring-4 focus:ring-green-300 rounded-lg w-full"
           disabled={loading}
         >
-          {loading ? "Processing..." : "Upload Your PDF"}
+          {loading ? "Processing..." : "Upload Your Resume"}
         </Button>
       </form>
     );
