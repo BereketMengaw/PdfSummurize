@@ -1,2 +1,2 @@
-# PdfSummurize
-SaaS application for Pdf summurize and powered by ai tools for organised summery .
+resume checker - micro saas app to analyse the pdf resume and give reccomadation for improvments 
+
