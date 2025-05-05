@@ -58,7 +58,7 @@ const PricingPlans = () => {
           <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-emerald-400 relative">
             <div className="absolute top-0 right-0 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg flex items-center">
               <Crown className="h-4 w-4 mr-1" />
-              <span>Popular</span>
+              <span>Coming Soon!</span>
             </div>
 
             <div className="p-6">
