@@ -55,7 +55,7 @@ export default function Header() {
   href="/upload"
   className="px-4 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 font-medium transition-colors"
 >
-  Upload a PDF
+  Upload a Resume
 </NavLink>
 
               </div>
