@@ -19,8 +19,8 @@ const PricingPlans = () => {
               <p className="text-gray-600 mb-6">Essential resume analysis</p>
 
               <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900">$5</span>
-                <span className="text-gray-500"> / one-time</span>
+                <span className="text-4xl font-bold text-gray-900">$0</span>
+                <span className="text-gray-500"> </span>
               </div>
 
               <ul className="space-y-3 text-left">
