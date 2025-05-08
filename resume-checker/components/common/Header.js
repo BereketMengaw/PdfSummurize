@@ -44,9 +44,8 @@ export default function Header() {
                 <div className="flex align-bottom mr-1 ">
                   <UserButton />
                 </div>
-                <NavLink
-  href="/upload"
-  className="px-4 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 font-medium transition-colors"
+                <NavLink href="/upload"
+ className="px-4 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 font-medium transition-colors"
 >
   Upload a Resume
 </NavLink>
