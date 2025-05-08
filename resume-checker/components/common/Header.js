@@ -32,14 +32,7 @@ export default function Header() {
             Pricing Plan
           </NavLink>
         </div>
-        <SignedIn>
-          <NavLink
-            href="/#Pricing"
-            className="text-gray-700 hover:text-emerald-600 font-medium transition-colors"
-          >
-            Your Resume Results
-          </NavLink>
-        </SignedIn>
+        
       </div>
 
       {/* Auth Section */}

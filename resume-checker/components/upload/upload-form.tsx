@@ -9,6 +9,7 @@ import { useState, useRef } from "react";
 import { generateResult } from "@/lib/openai";
 
 type ParsedResult = {
+  name: string[];
   score: number;
   summary: string;
   positives?: string[];
@@ -20,16 +21,16 @@ type ParsedResult = {
 
 
 export default function UploadForm() {
-  const [url, setUrl] = useState<string | null>(null);
+  const [, setUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false); // ✅ Added loading state
   const formRef = useRef<HTMLFormElement>(null);
   const [result, setResult] = useState<unknown | null>(null);
 
   const { startUpload } = useUploadThing("pdfUploader", {
     onClientUploadComplete: (res) => {
-      if (res && res[0]?.url) {
-        setUrl(res[0].url);
-        console.log("Upload complete", res[0].url);
+      if (res && res[0]?.ufsUrl) {
+        setUrl(res[0].ufsUrl);
+        console.log("Upload complete", res[0].ufsUrl);
       } else {
         console.error("No URL found after upload.");
       }
@@ -44,61 +45,55 @@ export default function UploadForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true); // ✅ Start loading
-
+    setLoading(true);
+  
     const schema = z.object({
       file: z
         .instanceof(File, { message: "Invalid file" })
-        .refine(
-          (file) => file.size <= 20 * 1024 * 1024,
-          "File must be less than 20MB"
-        )
-        .refine(
-          (file) => file.type === "application/pdf",
-          "Only PDF files allowed"
-        ),
+        .refine((file) => file.size <= 20 * 1024 * 1024, "File must be less than 20MB")
+        .refine((file) => file.type === "application/pdf", "Only PDF files allowed"),
     });
-
+  
     const formData = new FormData(e.currentTarget);
     const file = formData.get("file") as File;
     const validated = schema.safeParse({ file });
-
+  
     if (!validated.success) {
-      toast.error(
-        validated.error.flatten().fieldErrors.file?.[0] ?? "Invalid file"
-      );
+      toast.error(validated.error.flatten().fieldErrors.file?.[0] ?? "Invalid file");
       setLoading(false);
       return;
     }
-
+  
     try {
-      await startUpload([file]);
-
-      if (url) {
-        const summary = await fetchAndExtractPdfText(url);
-        console.log("Extracted PDF text:", summary);
-
-        if (!summary) {
-          toast.error("Failed to extract text from PDF.");
-          setLoading(false);
-          return;
-        }
-
-        const result = await generateResult(summary);
-        setResult(result); // Store the result in state
-        
-
-        console.log("Generated result:", result);
-
-        formRef.current?.reset(); // Reset the form after successful upload
+      const res = await startUpload([file]);
+  
+      const uploadedUrl = res?.[0]?.ufsUrl;
+  
+      if (!uploadedUrl) {
+        toast.error("Failed to upload file.");
+        setLoading(false);
+        return;
       }
+  
+      const summary = await fetchAndExtractPdfText(uploadedUrl);
+      if (!summary) {
+        toast.error("Failed to extract text from PDF.");
+        setLoading(false);
+        return;
+      }
+  
+      const result = await generateResult(summary);
+      setResult(result);
+      formRef.current?.reset();
     } catch (error) {
       console.error("Error processing the file:", error);
       toast.error("An error occurred while processing the file.");
     }
-
-    setLoading(false); // ✅ End loading
+  
+    setLoading(false);
   };
+  
+  
   
 
   const parsedResult = (typeof result === "string"
@@ -123,9 +118,16 @@ export default function UploadForm() {
           loading={loading}
         />
       </div>
+
+      {loading && (
+  <div className="mt-4 text-center text-gray-600 animate-pulse">
+    <p className="text-lg font-medium">⏳ Please wait, we are analyzing your resume...</p>
+  </div>
+)}
+
       {parsedResult && (
   <div className="mt-10 p-6 bg-white border border-green-300 rounded-2xl shadow-lg space-y-6">
-    <h3 className="text-2xl font-extrabold text-green-800">Resume Evaluation Summary</h3>
+    <h3 className="text-2xl font-extrabold text-green-800">Resume Evaluation Summary for {parsedResult.name} </h3>
 
     <div className="text-gray-700 space-y-4">
       <div>

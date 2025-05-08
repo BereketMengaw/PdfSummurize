@@ -2,7 +2,7 @@ import { CheckCircle2, Crown } from "lucide-react";
 
 const PricingPlans = () => {
   return (
-    <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50" id="pricing">
+    <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50" id="Pricing">
       <div className="max-w-5xl mx-auto text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">
           Choose Your Plan

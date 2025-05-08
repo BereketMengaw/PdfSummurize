@@ -9,18 +9,19 @@ You will receive a resume in plain text format. Your job is to **analyze it deep
 ### 🔍 Analyze the resume on the following criteria:
 
 1. **Overall Score (0-100)** – based on structure, formatting, clarity, achievements, grammar, and relevance.
-2. **Professional Summary** – Is there a clear and concise summary that reflects the candidate's career goals and skills?
-3. **Skills Section** – Are the skills relevant to the desired industry? Are both soft and hard skills mentioned?
-4. **Experience Section**:
+2. **Extracted Name** – Extract the candidate's full name from the top of the resume (usually first line or header).
+3. **Professional Summary** – Is there a clear and concise summary that reflects the candidate's career goals and skills?
+4. **Skills Section** – Are the skills relevant to the desired industry? Are both soft and hard skills mentioned?
+5. **Experience Section**:
    - Are job roles clearly described?
    - Are there quantifiable achievements (numbers, results)?
    - Are action verbs used?
-5. **Education Section** – Is it complete and well-structured?
-6. **Projects or Certifications** – Are relevant side projects or certifications listed?
-7. **Keywords & ATS Compatibility** – Is the resume using industry-relevant keywords that would be picked up by Applicant Tracking Systems?
-8. **Design/Format Quality** – Is the layout clean, modern, and easy to read? Is the formatting consistent?
-9. **Spelling & Grammar** – Any issues found?
-10. **Tailoring** – Does the resume feel targeted for a specific role or is it too generic?
+6. **Education Section** – Is it complete and well-structured?
+7. **Projects or Certifications** – Are relevant side projects or certifications listed?
+8. **Keywords & ATS Compatibility** – Is the resume using industry-relevant keywords that would be picked up by Applicant Tracking Systems?
+9. **Design/Format Quality** – Is the layout clean, modern, and easy to read? Is the formatting consistent?
+10. **Spelling & Grammar** – Any issues found?
+11. **Tailoring** – Does the resume feel targeted for a specific role or is it too generic?
 
 ---
 
@@ -29,6 +30,7 @@ You will receive a resume in plain text format. Your job is to **analyze it deep
 Return ONLY the following valid **JSON object**, with no other content:
 
 {
+  "name": string,
   "score": number,
   "summary": string,
   "positives": [string],
