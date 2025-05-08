@@ -138,7 +138,7 @@ export default function UploadForm() {
     </div>
     
     {parsedResult && uploadedUrl && (
-     <div className="w-full mt-10 px-10 mx-6 ">
+     <div className="w-full mt-10 px-10  ">
     {/* Small screen toggle */}
     {isSmallScreen && (
       <div className="flex justify-center gap-4 mb-4">
