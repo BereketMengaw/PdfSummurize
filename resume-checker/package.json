@@ -13,6 +13,7 @@
     "@langchain/core": "^0.3.43",
     "@neondatabase/serverless": "^1.0.0",
     "@radix-ui/react-slot": "^1.1.2",
+    "@stripe/stripe-js": "^7.3.0",
     "@uploadthing/react": "^7.3.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

@@ -7,6 +7,7 @@ import { useUploadThing } from "@/utils/uploadthing";
 import { toast } from "sonner";
 import { useState, useRef, useEffect } from "react";
 import { generateResult } from "@/lib/openai";
+import CheckoutButton from "../checkoutButton";
 
 type ParsedResult = {
   name: string[];
@@ -111,6 +112,7 @@ export default function UploadForm() {
 
   return (
     <div >
+    
     <div className="flex flex-col items-center gap-2 w-full max-w-2xl mx-auto py-3">
       <h2 className="text-green-800 text-2xl font-semibold text-center">
         Upload Your Resume
@@ -126,6 +128,18 @@ export default function UploadForm() {
           loading={loading}
         />
       </div>
+      {parsedResult && uploadedUrl && (
+        <div className="mt-4 text-center">
+          <p className="text-lg font-medium text-green-800">
+            Your resume has been successfully uploaded!
+          </p>
+          <p className="text-sm text-gray-600">
+            Click the button below to unlock your resume evaluation.
+          </p>
+          <CheckoutButton />
+        </div>
+      )}
+ 
 
       {loading && (
         <div className="mt-4 text-center text-gray-600 animate-pulse">
@@ -154,6 +168,9 @@ export default function UploadForm() {
         >
           📄 Resume
         </button>
+     
+
+        
       </div>
     )}
 
